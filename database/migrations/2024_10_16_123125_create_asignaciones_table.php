@@ -13,14 +13,15 @@ return new class extends Migration
     {
         Schema::create('asignaciones', function (Blueprint $table) {
             $table->id();
-            $table->timestamps();
-            $table->integer('codigo-asignacion');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('rol_id');
+            $table->string('codigo_asignacion')->unique();
+            $table->unsignedBigInteger('profesor_id');
+            $table->unsignedBigInteger('materia_id');
+            $table->unsignedBigInteger('periodo_id');
             $table->timestamps();
 
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('rol_id')->references('id')->on('roles')->onDelete('cascade');
+            $table->foreign('profesor_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('materia_id')->references('id')->on('materias')->onDelete('cascade');
+            $table->foreign('periodo_id')->references('id')->on('periodos')->onDelete('cascade');
         });
     }
 

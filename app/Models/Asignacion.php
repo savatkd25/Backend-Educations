@@ -1,24 +1,33 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Asignacion extends Model
 {
-    use HasFactory;
+    // Atributos asignables en masa
+    protected $fillable = [
+        'codigo_asignacion', 'profesor_id', 'materia_id', 'periodo_id',
+    ];
 
-    protected $fillable = ['user_id', 'rol_id'];
+    // Relaciones
 
-    public function user()
+    // Relación inversa con User (profesor)
+    public function profesor()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'profesor_id');
     }
 
-    //Relacion con materia
+    // Relación inversa con Materia
     public function materia()
     {
         return $this->belongsTo(Materia::class);
     }
 
+    // Relación inversa con Periodo
+    public function periodo()
+    {
+        return $this->belongsTo(Periodo::class);
+    }
 }

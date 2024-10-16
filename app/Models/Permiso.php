@@ -1,12 +1,23 @@
 <?php
+
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Permiso extends Model
 {
-    use HasFactory;
+    // Atributos asignables en masa
+    protected $fillable = [
+        'nombre', 'descripcion',
+    ];
 
-    protected $fillable = ['nombre'];
+    // Relaciones
+
+    // Relación muchos a muchos con Role
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+    
 }
+

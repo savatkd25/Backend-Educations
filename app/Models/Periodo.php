@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Materia extends Model
+class Periodo extends Model
 {
     // Atributos asignables en masa
     protected $fillable = [
-        'nombre', 'descripcion', 'nivel',
+        'nombre', 'fecha_inicio', 'fecha_fin',
     ];
 
     // Relaciones

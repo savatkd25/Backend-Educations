@@ -8,9 +8,48 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
+use App\Models\Role;
+use Illuminate\Support\Facades\DB; 
 class AuthController extends Controller
 {
+
+    private function verificarRol($rolNombre)
+    {
+        $user = Auth::user();
+
+        // Obtener los roles asociados al usuario
+        $roles = $user->roles;
+
+        // Verificar si alguno de los roles coincide con el nombre del rol requerido
+        foreach ($roles as $rol) {
+            if ($rol->nombre === $rolNombre) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    private function verificarPermiso($permisoNombre)
+    {
+        $user = Auth::user();
+
+        // Obtener los roles asociados al usuario
+        $roles = $user->roles;
+
+        // Iterar sobre cada rol del usuario
+        foreach ($roles as $rol) {
+            // Verificar si el rol tiene el permiso requerido
+            if ($rol->permisos()->where('nombre', $permisoNombre)->exists()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
 
     /**
      * Register a User.
@@ -29,14 +68,72 @@ class AuthController extends Controller
             return response()->json($validator->errors()->toJson(), 400);
         }
 
+        try {
+            // Iniciar la transacción
+            DB::beginTransaction();
+
+            $user = new User;
+            $user->name = request()->name;
+            $user->email = request()->email;
+            $user->password = bcrypt(request()->password);
+            $user->save();
+
+            // Asignar rol predeterminado 'estudiante'
+            $rolEstudiante = Role::where('nombre', 'estudiante')->first();
+
+            if (!$rolEstudiante) {
+                // Si no se encuentra el rol 'estudiante', lanzar una excepción
+                throw new \Exception("El rol 'estudiante' no existe.");
+            }
+
+            $user->roles()->attach($rolEstudiante->id);
+
+            // Confirmar la transacción
+            DB::commit();
+
+            return response()->json($user, 201);
+        } catch (\Exception $e) {
+            // Revertir la transacción si ocurre un error
+            DB::rollBack();
+
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+
+    /*
+        Register con roles para admin
+    */
+    public function registerWithRole()
+    {
+        // Verificar si el usuario autenticado es administrador
+        if (!$this->verificarRol('administrador')) {
+            return response()->json(['error' => 'No tienes permiso para realizar esta acción.'], 403);
+        }
+
+        $validator = Validator::make(request()->all(), [
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|confirmed|min:8',
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
         $user = new User;
         $user->name = request()->name;
         $user->email = request()->email;
         $user->password = bcrypt(request()->password);
         $user->save();
 
+        // Asignar el rol especificado
+        $user->roles()->attach(request()->role_id);
+
         return response()->json($user, 201);
     }
+
 
 
     /**

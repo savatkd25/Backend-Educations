@@ -14,4 +14,7 @@ Route::group([
 });
 
 
+Route::post('/admin/register', [AuthController::class, 'registerWithRole'])->middleware('auth:api');
+
+
 Route::post('/login', [AuthController::class, 'login'])->name('login');
