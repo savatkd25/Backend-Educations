@@ -10,6 +10,24 @@ use Illuminate\Support\Facades\DB;
 
 class MateriaController extends Controller
 {
+    //funcion tieneRol
+    private function tieneRol($rolNombre)
+    {
+        $user = Auth::user();
+
+        // Obtener los roles asociados al usuario
+        $roles = $user->roles;
+
+        // Verificar si alguno de los roles coincide con el nombre del rol requerido
+        foreach ($roles as $rol) {
+            if ($rol->nombre === $rolNombre) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Muestra una lista paginada de las materias.
      */
@@ -17,10 +35,10 @@ class MateriaController extends Controller
     {
         $user = Auth::user();
 
-        if ($user->tieneRol('administrador')) {
+        if ($this->tieneRol('administrador')) {
             // El administrador puede ver todas las materias
             $materias = Materia::paginate(10);
-        } elseif ($user->tieneRol('profesor')) {
+        } elseif ($this->tieneRol('profesor')) {
             // El profesor solo puede ver sus materias asignadas
             $materias = Materia::whereHas('asignaciones', function ($query) use ($user) {
                 $query->where('profesor_id', $user->id);
@@ -40,7 +58,7 @@ class MateriaController extends Controller
         $user = Auth::user();
 
         // Solo el administrador puede crear materias
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para crear materias.'], 403);
         }
 
@@ -85,9 +103,9 @@ class MateriaController extends Controller
             return response()->json(['error' => 'Materia no encontrada.'], 404);
         }
 
-        if ($user->tieneRol('administrador')) {
+        if ($this->tieneRol('administrador')) {
             return response()->json($materia, 200);
-        } elseif ($user->tieneRol('profesor')) {
+        } elseif ($this->tieneRol('profesor')) {
             $tieneMateria = $materia->asignaciones()->where('profesor_id', $user->id)->exists();
 
             if ($tieneMateria) {
@@ -108,7 +126,7 @@ class MateriaController extends Controller
         $user = Auth::user();
 
         // Solo el administrador puede actualizar materias
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para actualizar materias.'], 403);
         }
 
@@ -154,7 +172,7 @@ class MateriaController extends Controller
         $user = Auth::user();
 
         // Solo el administrador puede eliminar materias
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para eliminar materias.'], 403);
         }
 

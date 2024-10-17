@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\User; // Asegúrate de que el modelo se llama User
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Role;
 
 class UsuarioController extends Controller
 {
@@ -108,9 +110,22 @@ class UsuarioController extends Controller
     public function getDocentes(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $docentes = User::where('rol_id', 2)->paginate($perPage);
 
-        return response()->json($docentes, Response::HTTP_OK);
+        // Utilizar whereHas para filtrar usuarios con rol_id 2
+        $docentes = User::whereHas('roles', function ($query) {
+            $query->where('role_id', 2);
+        })->paginate($perPage);
+
+        if ($docentes->isEmpty()) {
+            return response()->json([
+                'message' => 'Usuario no encontrado'
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        return response()->json([
+            'message' => 'Lista de docentes obtenida correctamente',
+            'data' => $docentes
+        ], Response::HTTP_OK);
     }
 
     /**
@@ -119,8 +134,14 @@ class UsuarioController extends Controller
     public function getEstudiantes(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $estudiantes = User::where('rol_id', 3)->paginate($perPage);
 
-        return response()->json($estudiantes, Response::HTTP_OK);
+        $estudiantes = User::whereHas('roles', function ($query) {
+            $query->where('nombre', 'estudiante');
+        })->paginate($perPage);
+
+        return response()->json([
+            'message' => 'Lista de estudiantes obtenida correctamente',
+            'data' => $estudiantes
+        ], Response::HTTP_OK);
     }
 }

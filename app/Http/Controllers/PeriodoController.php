@@ -26,13 +26,13 @@ class PeriodoController extends Controller
     {
         $data = $request->validate([
             'nombre'      => 'required|string|max:255',
-            'fechaInicio' => 'required|date',
-            'fechaFin'    => 'required|date|after_or_equal:fechaInicio',
+            'fecha_inicio' => 'required|date',
+            'fecha_fin'    => 'required|date|after_or_equal:fecha_inicio',
         ]);
 
         $periodo = Periodo::create($data);
 
-        return response()->json($periodo, Response::HTTP_CREATED);
+        return response()->json(['message' => 'Periodo creado correctamente', 'periodo' => $periodo], 201);
     }
 
     /**

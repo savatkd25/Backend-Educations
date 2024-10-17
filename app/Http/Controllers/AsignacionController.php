@@ -13,15 +13,33 @@ use Illuminate\Support\Facades\DB;
 
 class AsignacionController extends Controller
 {
+    //funcion tieneRol
+    private function tieneRol($rolNombre)
+    {
+        $user = Auth::user();
+
+        // Obtener los roles asociados al usuario
+        $roles = $user->roles;
+
+        // Verificar si alguno de los roles coincide con el nombre del rol requerido
+        foreach ($roles as $rol) {
+            if ($rol->nombre === $rolNombre) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     // Método index: Listar asignaciones con paginación
     public function index(Request $request)
     {
         $user = Auth::user();
 
         // Verificar permiso: Solo el administrador puede ver todas las asignaciones
-        if ($user->tieneRol('administrador')) {
+        if ($this->tieneRol('administrador')) {
             $asignaciones = Asignacion::with(['profesor', 'materia', 'periodo'])->paginate(10);
-        } elseif ($user->tieneRol('profesor')) {
+        } elseif ($this->tieneRol('profesor')) {
             // El profesor solo ve sus asignaciones
             $asignaciones = Asignacion::with(['profesor', 'materia', 'periodo'])
                 ->where('profesor_id', $user->id)
@@ -40,7 +58,7 @@ class AsignacionController extends Controller
         $user = Auth::user();
 
         // Verificar permiso: Solo el administrador puede crear asignaciones
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para crear asignaciones.'], 403);
         }
 
@@ -88,7 +106,7 @@ class AsignacionController extends Controller
         }
 
         // Verificar permiso
-        if ($user->tieneRol('administrador') || ($user->tieneRol('profesor') && $asignacion->profesor_id == $user->id)) {
+        if ($this->tieneRol('administrador') || ($this->tieneRol('profesor') && $asignacion->profesor_id == $user->id)) {
             return response()->json($asignacion, 200);
         } else {
             return response()->json(['error' => 'No tienes permiso para ver esta asignación.'], 403);
@@ -101,7 +119,7 @@ class AsignacionController extends Controller
         $user = Auth::user();
 
         // Verificar permiso: Solo el administrador puede actualizar asignaciones
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para actualizar asignaciones.'], 403);
         }
 
@@ -145,7 +163,7 @@ class AsignacionController extends Controller
         $user = Auth::user();
 
         // Verificar permiso: Solo el administrador puede eliminar asignaciones
-        if (!$user->tieneRol('administrador')) {
+        if (!$this->tieneRol('administrador')) {
             return response()->json(['error' => 'No tienes permiso para eliminar asignaciones.'], 403);
         }
 
