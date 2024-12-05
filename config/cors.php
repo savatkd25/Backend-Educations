@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'paths' => ['*'],  // O puedes limitarlo solo a las rutas necesarias, como 'api/*'
+    'dpaths' => ['*'],  // O puedes limitarlo solo a las rutas necesarias, como 'api/*'
 
     'allowed_methods' => ['*'],  // Permitir todos los métodos o especificar solo POST, GET, etc.
 

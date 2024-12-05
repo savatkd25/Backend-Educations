@@ -6,6 +6,9 @@ use App\Http\Controllers\MateriaController;
 use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\CursoController;
+
+
 
 Route::group([
     'middleware' => 'api',
@@ -45,6 +48,16 @@ Route::group([
     // Rutas para obtener docentes y estudiantes
     Route::get('/docentes', [UsuarioController::class, 'getDocentes']);
     Route::get('/estudiantes', [UsuarioController::class, 'getEstudiantes']);
+
+
+
+    //Rutas de los cursos
+    Route::get('/cursos', [CursoController::class, 'index']);
+    Route::post('/cursos', [CursoController::class, 'store']);
+    Route::get('/cursos/{id}', [CursoController::class, 'show']);
+    Route::put('/cursos/{id}', [CursoController::class, 'update']);
+    Route::delete('/cursos/{id}', [CursoController::class, 'destroy']);
+
 
     Route::post('/admin/register', [AuthController::class, 'registerWithRole']);
 });
