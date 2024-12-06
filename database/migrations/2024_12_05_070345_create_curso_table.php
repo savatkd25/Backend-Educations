@@ -23,7 +23,7 @@ return new class extends Migration
             $table->date('fecha_fin');
             //fk a asignacion
             $table->unsignedBigInteger('asignacion_id');
-            $table->foreign('asignacion_id')->references('id')->on('asignacion');
+            $table->foreign('asignacion_id')->references('id')->on('asignaciones');
         });
     }
 

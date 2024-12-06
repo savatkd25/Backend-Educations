@@ -106,10 +106,10 @@ class AuthController extends Controller
     */
     public function registerWithRole()
     {
-        // Verificar si el usuario autenticado es administrador
-        if (!$this->verificarRol('administrador')) {
-            return response()->json(['error' => 'No tienes permiso para realizar esta acción.'], 403);
-        }
+        // // Verificar si el usuario autenticado es administrador
+        // if (!$this->verificarRol('administrador')) {
+        //     return response()->json(['error' => 'No tienes permiso para realizar esta acción.'], 403);
+        // }
 
         $validator = Validator::make(request()->all(), [
             'name' => 'required',

@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('entrega', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('archivo', 255);
             $table->text('comentarios')->nullable();
             $table->unsignedBigInteger('tarea_id');
             $table->unsignedBigInteger('estudiante_id');

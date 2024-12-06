@@ -59,7 +59,6 @@ Route::group([
     Route::delete('/cursos/{id}', [CursoController::class, 'destroy']);
 
 
-    Route::post('/admin/register', [AuthController::class, 'registerWithRole']);
 });
 
 

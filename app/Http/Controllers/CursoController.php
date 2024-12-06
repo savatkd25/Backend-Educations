@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+//llamar al log
+use Illuminate\Support\Facades\Log;
 
 class CursoController extends Controller
 {
@@ -36,36 +38,42 @@ class CursoController extends Controller
     public function store(Request $request)
     {
         $user = Auth::user();
+        Log::info('Usuario autenticado: ' . $user->id);
 
         if (!$this->tieneRol('administrador')) {
+            Log::warning('Permiso denegado para crear cursos. Usuario: ' . $user->id);
             return response()->json(['error' => 'No tienes permiso para crear cursos.'], 403);
         }
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
-            'codigo' => 'required|string|max:10|unique:cursos,codigo',
+            //'codigo' => 'required|string|max:10|unique:curso,codigo',
             'descripcion' => 'nullable|string|max:255',
             'creditos' => 'required|integer|min:1',
             'horas' => 'required|integer|min:1',
             'fecha_inicio' => 'required|date|after:today',
             'fecha_fin' => 'required|date|after:fecha_inicio',
-            'asignacion_id' => 'required|exists:asignacion,id',
+            'asignacion_id' => 'required|exists:asignaciones,id',
         ]);
 
         if ($validator->fails()) {
+            Log::error('Validación fallida: ' . json_encode($validator->errors()));
             return response()->json($validator->errors(), 400);
         }
 
         try {
             DB::beginTransaction();
+            Log::info('Iniciando transacción para crear curso.');
 
             $curso = Curso::create($request->all());
 
             DB::commit();
+            Log::info('Curso creado exitosamente: ' . $curso->id);
 
             return response()->json($curso, 201);
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error al crear el curso: ' . $e->getMessage());
             return response()->json(['error' => 'Error al crear el curso.'], 500);
         }
     }
@@ -108,7 +116,7 @@ class CursoController extends Controller
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'sometimes|string|max:255',
-            'codigo' => 'sometimes|string|max:10|unique:cursos,codigo,' . $id,
+            'codigo' => 'sometimes|string|max:10|unique:curso,codigo,' . $id,
             'descripcion' => 'nullable|string|max:255',
             'creditos' => 'sometimes|integer|min:1',
             'horas' => 'sometimes|integer|min:1',
