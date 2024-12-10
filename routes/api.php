@@ -7,7 +7,8 @@ use App\Http\Controllers\PeriodoController;
 use App\Http\Controllers\AsignacionController;
 use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CursoController;
-
+use App\Http\Controllers\CursoEstudianteController;
+use App\Http\Controllers\TareaController;
 
 
 Route::group([
@@ -40,7 +41,6 @@ Route::group([
 
     // Rutas para Usuarios
     Route::get('/usuarios', [UsuarioController::class, 'index']);
-    Route::post('/usuarios', [UsuarioController::class, 'store']);
     Route::get('/usuarios/{id}', [UsuarioController::class, 'show']);
     Route::put('/usuarios/{id}', [UsuarioController::class, 'update']);
     Route::delete('/usuarios/{id}', [UsuarioController::class, 'destroy']);
@@ -49,8 +49,6 @@ Route::group([
     Route::get('/docentes', [UsuarioController::class, 'getDocentes']);
     Route::get('/estudiantes', [UsuarioController::class, 'getEstudiantes']);
 
-
-
     //Rutas de los cursos
     Route::get('/cursos', [CursoController::class, 'index']);
     Route::post('/cursos', [CursoController::class, 'store']);
@@ -58,9 +56,20 @@ Route::group([
     Route::put('/cursos/{id}', [CursoController::class, 'update']);
     Route::delete('/cursos/{id}', [CursoController::class, 'destroy']);
 
+    //Rutas de las tareas
+    Route::get('/tareas', [TareaController::class, 'index']);
+    Route::post('/tareas', [TareaController::class, 'store']);
+    Route::get('/tareas/{id}', [TareaController::class, 'show']);
+    Route::put('/tareas/{id}', [TareaController::class, 'update']);
+    Route::delete('/tareas/{id}', [TareaController::class, 'destroy']);
+
+    //Asignar estudiante a un curso
+    Route::post('/asignar/curso', [CursoEstudianteController::class, 'store']);
 
 });
+Route::post('/usuarios', [UsuarioController::class, 'store']);
 
+Route::post('/register/user', [AuthController::class, 'registerWithRole']);
 
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');

@@ -31,9 +31,9 @@ class TareaController extends Controller
 
     public function store(Request $request)
     {
-        if (!$this->tieneRol('profesor')) {
-            return response()->json(['error' => 'No tienes permiso para crear tareas.'], 403);
-        }
+        // if (!$this->tieneRol('profesor')) {
+        //     return response()->json(['error' => 'No tienes permiso para crear tareas.'], 403);
+        // }
 
         $request->validate([
             'titulo' => 'required|string|max:255',

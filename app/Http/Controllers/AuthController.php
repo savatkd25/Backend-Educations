@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\Role;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
+
 class AuthController extends Controller
 {
 
@@ -157,18 +158,27 @@ class AuthController extends Controller
                 return response()->json(['error' => 'Credenciales inválidas'], 401);
             }
 
-            // Autenticación exitosa, generamos el token JWT
+            // Autenticación exitosa, obtenemos el usuario autenticado
             $user = Auth::user();
-            Log::info('Autenticación exitosa para el usuario: ' . $user->email);
 
-            // Devolvemos el token en la respuesta
-            return response()->json(compact('token'));
+            // Obtenemos el rol del usuario (asumiendo una relación con roles)
+            $rol = $user->roles()->pluck('nombre')->first(); // Ajusta según tu estructura
+           
+            // Registramos la autenticación exitosa
+            Log::info('Autenticación exitosa para el usuario: ' . $user->email . ', Rol: ' . $rol);
+
+            // Devolvemos el token y el rol en la respuesta
+            return response()->json([
+                'token' => $token,
+                'rol' => $rol,
+            ]);
         } catch (\Exception $e) {
             // En caso de error, registramos el error en el log y devolvemos un error 500
             Log::error('Error durante el proceso de login: ' . $e->getMessage());
             return response()->json(['error' => 'Error en el servidor'], 500);
         }
     }
+
     /**
      * Get the authenticated User.
      *

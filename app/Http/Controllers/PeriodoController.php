@@ -29,6 +29,8 @@ class PeriodoController extends Controller
             'fecha_inicio' => 'required|date',
             'fecha_fin'    => 'required|date|after_or_equal:fecha_inicio',
         ]);
+        
+        
 
         $periodo = Periodo::create($data);
 
