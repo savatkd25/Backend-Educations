@@ -67,6 +67,7 @@ Route::group([
     Route::post('/asignar/curso', [CursoEstudianteController::class, 'store']);
 
 });
+
 Route::post('/usuarios', [UsuarioController::class, 'store']);
 
 Route::post('/register/user', [AuthController::class, 'registerWithRole']);

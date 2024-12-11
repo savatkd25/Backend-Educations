@@ -57,7 +57,7 @@ class CursoController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::error('Validación fallida: ' . json_encode($validator->errors()));
+            Log::error('Error: ' . json_encode($validator->errors()));
             return response()->json($validator->errors(), 400);
         }
 

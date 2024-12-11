@@ -55,12 +55,12 @@ class MateriaController extends Controller
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
+        // $user = Auth::user();
 
-        // Solo el administrador puede crear materias
-        if (!$this->tieneRol('administrador')) {
-            return response()->json(['error' => 'No tienes permiso para crear materias.'], 403);
-        }
+        // // Solo el administrador puede crear materias
+        // if (!$this->tieneRol('administrador')) {
+        //     return response()->json(['error' => 'No tienes permiso para crear materias.'], 403);
+        // }
 
         $validator = Validator::make($request->all(), [
             'nombre' => 'required|string|max:255',
