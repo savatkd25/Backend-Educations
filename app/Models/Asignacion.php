@@ -28,6 +28,12 @@ class Asignacion extends Model
         return $this->belongsTo(Materia::class);
     }
 
+    //relacion con curso
+    public function curso()
+    {
+        return $this->hasOne(Curso::class);
+    }
+
     // Relación inversa con Periodo
     public function periodo()
     {

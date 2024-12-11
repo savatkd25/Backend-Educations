@@ -9,7 +9,7 @@ use App\Http\Controllers\UsuarioController;
 use App\Http\Controllers\CursoController;
 use App\Http\Controllers\CursoEstudianteController;
 use App\Http\Controllers\TareaController;
-
+use App\Http\Controllers\EntregaController;
 
 Route::group([
     'middleware' => 'api',
@@ -57,15 +57,23 @@ Route::group([
     Route::delete('/cursos/{id}', [CursoController::class, 'destroy']);
 
     //Rutas de las tareas
-    Route::get('/tareas', [TareaController::class, 'index']);
-    Route::post('/tareas', [TareaController::class, 'store']);
-    Route::get('/tareas/{id}', [TareaController::class, 'show']);
-    Route::put('/tareas/{id}', [TareaController::class, 'update']);
-    Route::delete('/tareas/{id}', [TareaController::class, 'destroy']);
+    Route::get('/tareas', [TareaController::class, 'listarTodas'])->name('tareas.listar'); // Opcional para todas las tareas
+    Route::get('/tareas/{cursoId}', [TareaController::class, 'index'])->name('tareas.index');
+    Route::post('/tareas', [TareaController::class, 'store'])->name('tareas.store');
+    Route::get('/tareas/detalle/{id}', [TareaController::class, 'show'])->name('tareas.show');
+    Route::put('/tareas/{id}', [TareaController::class, 'update'])->name('tareas.update');
+    Route::delete('/tareas/{id}', [TareaController::class, 'destroy'])->name('tareas.destroy');
+
+
+    //Rutas de entregas de tareas
+    Route::get('/entregas', [EntregaController::class, 'index']);
+    Route::post('/entregas', [EntregaController::class, 'store']);
+    Route::get('/entregas/{id}', [EntregaController::class, 'show']);
+    Route::delete('/entregas/{id}', [EntregaController::class, 'destroy']);
+
 
     //Asignar estudiante a un curso
     Route::post('/asignar/curso', [CursoEstudianteController::class, 'store']);
-
 });
 
 Route::post('/usuarios', [UsuarioController::class, 'store']);

@@ -21,13 +21,24 @@ class TareaController extends Controller
 
     public function index($cursoId)
     {
-        if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
-            return response()->json(['error' => 'No tienes permiso para listar tareas.'], 403);
-        }
+        // if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
+        //     return response()->json(['error' => 'No tienes permiso para listar tareas.'], 403);
+        // }
 
         $tareas = Tarea::where('curso_id', $cursoId)->paginate(10);
         return response()->json($tareas, 200);
     }
+
+    public function listarTodas()
+    {
+        if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
+            return response()->json(['error' => 'No tienes permiso para listar tareas.'], 403);
+        }
+
+        $tareas = Tarea::paginate(10); // Lista todas las tareas con paginación
+        return response()->json($tareas, 200);
+    }
+
 
     public function store(Request $request)
     {
@@ -81,6 +92,7 @@ class TareaController extends Controller
 
         return response()->json($data, 200);
     }
+
 
 
     public function destroy($id)

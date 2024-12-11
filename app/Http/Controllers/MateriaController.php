@@ -43,6 +43,11 @@ class MateriaController extends Controller
             $materias = Materia::whereHas('asignaciones', function ($query) use ($user) {
                 $query->where('profesor_id', $user->id);
             })->paginate(10);
+        } elseif ($this->tieneRol('estudiante')) {
+            // El estudiante solo puede ver las materias asociadas a sus cursos
+            $materias = Materia::whereHas('asignaciones.curso.estudiantes', function ($query) use ($user) {
+                $query->where('estudiante_id', $user->id);
+            })->paginate(10);
         } else {
             return response()->json(['error' => 'No tienes permiso para ver las materias.'], 403);
         }
