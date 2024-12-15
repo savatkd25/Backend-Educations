@@ -93,7 +93,40 @@ class TareaController extends Controller
         return response()->json($data, 200);
     }
 
+    // Actualizar tarea
 
+    public function update(Request $request, $id)
+    {
+        if (!$this->tieneRol('profesor')) {
+            return response()->json(['error' => 'No tienes permiso para actualizar tareas.'], 403);
+        }
+
+        $tarea = Tarea::find($id);
+
+        if (!$tarea) {
+            return response()->json(['error' => 'Tarea no encontrada.'], 404);
+        }
+
+        
+
+        $rutaArchivo = null;
+
+        // Verificar si se subió un archivo
+        if ($request->hasFile('archivo')) {
+            $archivo = $request->file('archivo');
+            $rutaArchivo = $archivo->store('tareas', 'public'); // Guardar en carpeta 'public/tareas'
+        }
+
+        // Actualizar la tarea con el archivo (si existe)
+        $tarea->titulo = $request->input('titulo');
+        $tarea->descripcion = $request->input('descripcion');
+        $tarea->fecha_entrega = $request->input('fecha_entrega');
+        $tarea->curso_id = $request->input('curso_id');
+        $tarea->archivo = $rutaArchivo; // Guardamos la ruta del archivo
+        $tarea->save();
+
+        return response()->json($tarea, 200);
+    }
 
     public function destroy($id)
     {

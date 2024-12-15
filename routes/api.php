@@ -74,6 +74,14 @@ Route::group([
 
     //Asignar estudiante a un curso
     Route::post('/asignar/curso', [CursoEstudianteController::class, 'store']);
+
+
+    //Rutas de para calificar una tarea
+    Route::put('/entrega/calificar/{id}', [EntregaController::class, 'calificarEntrega']);
+    Route::get('/entrega/promedio/{estudianteId}', [EntregaController::class, 'promedioCalificaciones']);
+    Route::get('/tarea/{tareaId}/entregas', [EntregaController::class, 'obtenerEntregasPorTarea']);
+
+
 });
 
 Route::post('/usuarios', [UsuarioController::class, 'store']);
