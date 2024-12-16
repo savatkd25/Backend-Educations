@@ -43,19 +43,95 @@ class EntregaController extends Controller
         ]);
     }
 
+    public function verCalificaciones()
+    {
+        $user = Auth::user();
+
+        if ($this->tieneRol('profesor')) {
+            // Obtener calificaciones de todos los estudiantes
+            $calificaciones = Entrega::with('estudiante')
+                ->whereNotNull('calificacion') // Solo entregas calificadas
+                ->get()
+                ->groupBy('estudiante_id'); // Agrupar por estudiante
+
+            $datos = $calificaciones->map(function ($entregas, $estudianteId) {
+                $promedio = $entregas->avg('calificacion'); // Calcular promedio
+                return [
+                    'estudiante' => $entregas->first()->estudiante->name,
+                    'entregas' => $entregas->map(function ($entrega) {
+                        return [
+                            'tarea_id' => $entrega->tarea_id,
+                            'calificacion' => $entrega->calificacion,
+                        ];
+                    }),
+                    'promedio_final' => round($promedio, 2),
+                ];
+            });
+
+            return response()->json([
+                'datos' => $datos,
+                'esProfesor' => true,
+            ], 200);
+        }
+
+        if ($this->tieneRol('estudiante')) {
+            // Obtener calificaciones del estudiante autenticado
+            $entregas = Entrega::where('estudiante_id', $user->id)
+                ->whereNotNull('calificacion')
+                ->get();
+
+            $promedio = $entregas->avg('calificacion'); // Calcular promedio general
+
+            return response()->json([
+                'entregas' => $entregas->map(function ($entrega) {
+                    return [
+                        'tarea_id' => $entrega->tarea_id,
+                        'calificacion' => $entrega->calificacion,
+                    ];
+                }),
+                'promedio' => round($promedio, 2),
+                'esProfesor' => false,
+            ], 200);
+        }
+
+        return response()->json([
+            'error' => 'No tienes permisos para ver esta información.',
+        ], 403);
+    }
+
+
     // Obtener entregas de una tarea específica
     public function obtenerEntregasPorTarea($tareaId)
     {
+        // Consultar las entregas relacionadas con la tarea
         $entregas = Entrega::where('tarea_id', $tareaId)
-            ->with('estudiante:id,name') // Obtener el nombre del estudiante
+            ->with([
+                'estudiante:id,name', // Asegúrate de que la relación 'estudiante' esté correctamente definida
+            ])
+            ->select('id', 'tarea_id', 'estudiante_id', 'archivo', 'calificacion') // Incluir los campos relevantes
             ->get();
 
+        // Verificar si hay entregas
         if ($entregas->isEmpty()) {
             return response()->json(['message' => 'No hay entregas registradas para esta tarea'], 404);
         }
 
+        // Retornar las entregas con sus relaciones
         return response()->json($entregas);
     }
+
+    //Funcion para descargar archivos del public/storage/entrega
+    public function descargarArchivo($nombreArchivo)
+    {
+        $rutaArchivo = storage_path('app/public/entregas/' . $nombreArchivo);
+
+        if (!file_exists($rutaArchivo)) {
+            return response()->json(['error' => 'Archivo no encontrado.'], 404);
+        }
+
+        return response()->download($rutaArchivo);
+    }
+
 
     // Método para calificar una entrega
     public function calificarEntregas(Request $request)
@@ -78,9 +154,9 @@ class EntregaController extends Controller
 
     public function index($tareaId)
     {
-        if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
-            return response()->json(['error' => 'No tienes permiso para listar entregas.'], 403);
-        }
+        // if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
+        //     return response()->json(['error' => 'No tienes permiso para listar entregas.'], 403);
+        // }
 
         $entregas = Entrega::where('tarea_id', $tareaId)->paginate(10);
         return response()->json($entregas, 200);

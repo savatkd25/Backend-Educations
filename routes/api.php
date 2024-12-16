@@ -66,9 +66,9 @@ Route::group([
 
 
     //Rutas de entregas de tareas
-    Route::get('/entregas', [EntregaController::class, 'index']);
+    Route::get('/entregas/{tareaId}', [EntregaController::class, 'index']);
     Route::post('/entregas', [EntregaController::class, 'store']);
-    Route::get('/entregas/{id}', [EntregaController::class, 'show']);
+    Route::get('/entrega/{id}', [EntregaController::class, 'show']);
     Route::delete('/entregas/{id}', [EntregaController::class, 'destroy']);
 
 
@@ -77,11 +77,16 @@ Route::group([
 
 
     //Rutas de para calificar una tarea
-    Route::put('/entrega/calificar/{id}', [EntregaController::class, 'calificarEntrega']);
+    Route::put('/entrega/calificar/{id}', [EntregaController::class, 'calificarEntregas']);
     Route::get('/entrega/promedio/{estudianteId}', [EntregaController::class, 'promedioCalificaciones']);
     Route::get('/tarea/{tareaId}/entregas', [EntregaController::class, 'obtenerEntregasPorTarea']);
 
+    //Rutas de descargar archivos
+    Route::get('/entrega/descargar/{nombreArchivo}', [EntregaController::class, 'descargarArchivo']);
 
+
+    //ruta para ver las calificaciones
+    Route::get('/calificaciones', [EntregaController::class, 'verCalificaciones']);
 });
 
 Route::post('/usuarios', [UsuarioController::class, 'store']);

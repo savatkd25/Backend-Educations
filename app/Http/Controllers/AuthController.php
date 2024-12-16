@@ -171,6 +171,8 @@ class AuthController extends Controller
             return response()->json([
                 'token' => $token,
                 'rol' => $rol,
+                //retornar el id
+                'id' => $user->id
             ]);
         } catch (\Exception $e) {
             // En caso de error, registramos el error en el log y devolvemos un error 500

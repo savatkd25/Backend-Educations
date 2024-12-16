@@ -31,9 +31,9 @@ class TareaController extends Controller
 
     public function listarTodas()
     {
-        if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
-            return response()->json(['error' => 'No tienes permiso para listar tareas.'], 403);
-        }
+        // if (!$this->tieneRol('profesor') && !$this->tieneRol('administrador')) {
+        //     return response()->json(['error' => 'No tienes permiso para listar tareas.'], 403);
+        // }
 
         $tareas = Tarea::paginate(10); // Lista todas las tareas con paginación
         return response()->json($tareas, 200);
