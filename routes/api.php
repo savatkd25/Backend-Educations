@@ -90,6 +90,7 @@ Route::group([
 });
 
 Route::post('/usuarios', [UsuarioController::class, 'store']);
+Route::get('/usuarios', [UsuarioController::class, 'show']);
 
 Route::post('/register/user', [AuthController::class, 'registerWithRole']);
 
